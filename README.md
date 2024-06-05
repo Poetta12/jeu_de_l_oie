@@ -84,4 +84,5 @@ La fonction `keyPressed()` gère les actions lorsqu'une touche est pressée, not
 
 ## Crédits
 
-Ce jeu a été développé en utilisant le langage de programmation Processing. Amusez-vous bien !
+Ce jeu a été développé en utilisant le langage de programmation Java (from Processing).
+by Poetta@PoettaTech_FSDS | 2024 | Campus Numérique in the Alps
