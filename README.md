@@ -87,3 +87,25 @@ La fonction `keyPressed()` gère les actions lorsqu'une touche est pressée, not
 Ce jeu a été développé en utilisant le langage de programmation Java (from Processing).
 
 By Poetta@PoettaTech_FSDS | 2024 | Campus Numérique in the Alps
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Explications des modifications :
+Prison (Case 52) : Lorsqu'un joueur atterrit sur la case 52, il est mis en prison (inPrison[currentPlayer] = true;) et son tour est passé (skipTurn[currentPlayer] = true;). Il doit attendre qu'un autre joueur atterrisse sur la même case pour être libéré.
+
+Libération de la prison et du puits : Lorsque ce n'est pas le tour d'un joueur en prison ou dans le puits, la fonction handleSpecialCases() vérifie si un autre joueur est sur la même case et le libère si c'est le cas.
+
+Lancer des dés et gestion des tours : Le joueur ne peut lancer les dés que s'il n'est pas en train de passer son tour et n'est pas en prison (!skipTurn[currentPlayer] && !inPrison[currentPlayer]).
+
+Affichage des messages : Les messages sont mis à jour pour refléter l'état des joueurs, notamment lorsqu'ils sont en prison ou dans le puits.
