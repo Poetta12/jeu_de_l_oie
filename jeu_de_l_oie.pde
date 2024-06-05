@@ -11,6 +11,7 @@ int currentPlayerWon = -1; // Variable pour suivre le joueur qui a gagné
 boolean gameOn = true; // Variable pour indiquer si le jeu est en cours ou terminé
 boolean[] skipTurn = new boolean[numPlayers]; // Tableau pour indiquer si un joueur doit passer son tour
 boolean[] inWell = new boolean[numPlayers]; // Tableau pour indiquer si un joueur est dans le puits
+boolean[] inPrison = new boolean[numPlayers]; // Tableau pour indiquer si un joueur est en prison
 String[] messages = new String[numPlayers]; // Messages spécifiques à chaque joueur
 boolean playerWon = false; // Variable pour indiquer si un joueur a gagné
 
@@ -51,7 +52,7 @@ void handleSpecialCases() {
       messages[currentPlayer] = "Avance encore de " + extraMove + " cases grâce à l'oie.";
       break;
     case 19:
-      messages[currentPlayer] = "Est à l'hôtel et passe 1 tour."; // Passer deux tours
+      messages[currentPlayer] = "Est à l'hôtel et passe 1 tour."; // Passer un tour
       skipTurn[currentPlayer] = true;
       break;
     case 31:
@@ -64,11 +65,35 @@ void handleSpecialCases() {
       break;
     case 52:
       messages[currentPlayer] = "Est en prison et attend qu'un autre joueur le libère."; // Attendre qu'un autre joueur le libère
+      inPrison[currentPlayer] = true;
+      skipTurn[currentPlayer] = true; // Le joueur ne peut pas jouer tant qu'il est en prison
       break;
     case 58:
       playerPositions[currentPlayer] = 0; // Retourner au début du plateau
       messages[currentPlayer] = "Tombe sur la tête de mort et recommence depuis le début.";
       break;
+  }
+
+  // Vérifier si un joueur en prison doit être libéré
+  if (!inPrison[currentPlayer]) {
+    for (int i = 0; i < numPlayers; i++) {
+      if (i != currentPlayer && playerPositions[i] == playerPositions[currentPlayer] && inPrison[i]) {
+        inPrison[i] = false; // Libérer le joueur en prison
+        skipTurn[i] = false; // Permettre au joueur de rejouer
+        messages[i] = "Est libéré de prison par Joueur " + (currentPlayer + 1) + ".";
+      }
+    }
+  }
+
+  // Vérifier si un joueur dans le puits doit être libéré
+  if (!inWell[currentPlayer]) {
+    for (int i = 0; i < numPlayers; i++) {
+      if (i != currentPlayer && playerPositions[i] == playerPositions[currentPlayer] && inWell[i]) {
+        inWell[i] = false; // Libérer le joueur dans le puits
+        skipTurn[i] = false; // Permettre au joueur de rejouer
+        messages[i] = "Est libéré du puits par Joueur " + (currentPlayer + 1) + ".";
+      }
+    }
   }
 }
 
@@ -118,7 +143,7 @@ void drawBoard() {
       fill(255); // Cases normales (blanc)
     }
     // Dessiner la case
-        rect(xCoords[i] - caseSize / 2, yCoord - caseSize / 2, caseSize, caseSize);
+    rect(xCoords[i] - caseSize / 2, yCoord - caseSize / 2, caseSize, caseSize);
     fill(0);
     textSize(10);
     textAlign(LEFT);
@@ -172,7 +197,7 @@ void draw() {
 
 void keyPressed() {
   // Gérer les actions lorsqu'une touche est pressée
-  if (key == ' ' && !skipTurn[currentPlayer] && gameOn) {
+  if (key == ' ' && !skipTurn[currentPlayer] && !inPrison[currentPlayer] && gameOn) {
     // Lancer les dés si ce n'est pas le tour d'un joueur passé ou si le jeu est en cours
     dice1 = (int) random(1, 7); // Lancer le premier dé
     dice2 = (int) random(1, 7); // Lancer le deuxième dé
@@ -198,7 +223,10 @@ void keyPressed() {
     }
 
     currentPlayer = (currentPlayer + 1) % numPlayers; // Passer au joueur suivant
-  } else if (key == ' ' && skipTurn[currentPlayer]) {
+  } else if (key == ' ' && (skipTurn[currentPlayer] || inPrison[currentPlayer])) {
+    if (inPrison[currentPlayer]) {
+      messages[currentPlayer] = "Est toujours en prison.";
+    }
     skipTurn[currentPlayer] = false; // Réinitialiser le passage de tour pour le joueur actuel
     currentPlayer = (currentPlayer + 1) % numPlayers; // Passer au joueur suivant
   }
